@@ -5,14 +5,47 @@ project(car-plate-detector LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(OpenCV REQUIRED)
+# NOTE: need correct version of libcharls-dev
+# opencv >= 4.5 (debian 11) or >= 4.2 (ubuntu 20.04)
+find_package(OpenCV 4.2.0 REQUIRED)
 include_directories(${OpenCV_INCLUDE_DIRS})
+# NOTE: debian 11
+set(OpenCV_DATAFILES_PATH ${CMAKE_CURRENT_SOURCE_DIR}/data/opencv4/)
+
+# NOTE: libtesseract >= 4.1 and packages: tesseract-ocr-eng tesseract-ocr-rus
+# NOTE: whitelist and blacklist not supported for LSTM
+# https://github.com/tesseract-ocr/tesseract/issues/751
+find_package(Tesseract 4.1)
+if (NOT ${Tesseract_FOUND})
+    find_package(PkgConfig REQUIRED)
+    pkg_check_modules(Tesseract REQUIRED IMPORTED_TARGET GLOBAL tesseract lept)
+    add_library(Tesseract::libresseract ALIAS PkgConfig::Tesseract)
+
+    set(Tesseract_LIBRARIES Tesseract::libresseract)
+    set(Tesseract_INCLUDE_DIRS)
+endif()
+
+include_directories(${Tesseract_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
+
+find_package(Boost 1.52 REQUIRED locale)
 
 set(SRC_FILES
-    main.cpp
+    src/main.cpp
+    src/base/carplatenumberdetector.cpp
+    src/misc/ocr.cpp
+    src/carplatenumberdetector_russian.cpp
 )
 set(HEADER_FILES
+    src/base/carplatenumberdetector.h
+    src/misc/logger.h
+    src/misc/ocr.h
+    src/carplatenumberdetector_russian.h
 )
+set(PROJECT_COMPILE_DEFINITIONS
+    -DHAARCASCADE_CAR_PLATE_NUMBER_RUS=\"${OpenCV_DATAFILES_PATH}/haarcascades/haarcascade_russian_plate_number.xml\"
+    -DSOURCE_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}\")
+
 
 add_executable(${PROJECT_NAME} ${SRC_FILES} ${HEADER_FILES})
-target_link_libraries(${PROJECT_NAME} ${OpenCV_LIBS})
+target_link_libraries(${PROJECT_NAME} ${OpenCV_LIBS} ${Tesseract_LIBRARIES} ${Boost_LIBRARIES})
+target_compile_definitions(${PROJECT_NAME} PRIVATE ${PROJECT_COMPILE_DEFINITIONS})
