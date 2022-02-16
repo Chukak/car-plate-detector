@@ -1,14 +1,13 @@
 #ifndef UTILS_H
 #define UTILS_H
 
-#include <opencv2/core/cvstd.hpp>
-#include <opencv2/core/mat.hpp>
 #include <tesseract/baseapi.h>
 
-namespace misc
-{
-namespace ocr
-{
+#include <opencv2/core/cvstd.hpp>
+#include <opencv2/core/mat.hpp>
+
+namespace misc {
+namespace ocr {
 using TesseractAPIPtr = std::shared_ptr<tesseract::TessBaseAPI>;
 /**
  * @brief initGlobalAPI
@@ -39,39 +38,36 @@ cv::String extractTextFromImage(const cv::Mat& mat, TesseractAPIPtr api = global
  * @namespace internal
  * Contains functions and variables to work with images. Use it if you really need to.
  */
-namespace internal
-{
-struct constant
-{
-	/**
-	 * @brief DF_imageMaxSideWidth, DF_imageMaxSideHeight
-	 * Maximal width or height value to resize. By default: width is 130, height is 180.
-	 * \see searchTextOnDifferentSizes(...)
-	 */
-	static int DF_imageMaxSideWidth, DF_imageMaxSideHeight;
-	/**
-	 * @brief BLUR_MaxLevel
-	 * Maximal image blur level. By defaut is 18.
-	 * \see searchTextOnBluredImage(...)
-	 */
-	static int BLUR_MaxLevel;
-	/**
-	 * @brief SZ_imageWidth, SZ_imageHeight
-	 * Size of prepared to process image. By default: width is 520, height is 112.
-	 */
-	static int SZ_imageWidth, SZ_imageHeight;
-	/**
-	 * Undocumented variables
-	 */
-	static double LIMIT_imageMaxWidthCoef, LIMIT_imageMaxHeightCoef,
-			LIMIT_imageMinWidthCoef, LIMIT_imageMinHeightCoef, LIMIT_imageMinWidthInternalCoef,
-			LIMIT_imageMinHeightInternalCoef;
-	/**
-	 * Whitelist variables. Undocumented.
-	 */
-	const static cv::String WL_characters, WL_digits;
+namespace internal {
+struct constant {
+  /**
+   * @brief DF_imageMaxSideWidth, DF_imageMaxSideHeight
+   * Maximal width or height value to resize. By default: width is 130, height is 180.
+   * \see searchTextOnDifferentSizes(...)
+   */
+  static int DF_imageMaxSideWidth, DF_imageMaxSideHeight;
+  /**
+   * @brief BLUR_MaxLevel
+   * Maximal image blur level. By defaut is 18.
+   * \see searchTextOnBluredImage(...)
+   */
+  static int BLUR_MaxLevel;
+  /**
+   * @brief SZ_imageWidth, SZ_imageHeight
+   * Size of prepared to process image. By default: width is 520, height is 112.
+   */
+  static int SZ_imageWidth, SZ_imageHeight;
+  /**
+   * Undocumented variables
+   */
+  static double LIMIT_imageMaxWidthCoef, LIMIT_imageMaxHeightCoef, LIMIT_imageMinWidthCoef, LIMIT_imageMinHeightCoef,
+      LIMIT_imageMinWidthInternalCoef, LIMIT_imageMinHeightInternalCoef;
+  /**
+   * Whitelist variables. Undocumented.
+   */
+  const static cv::String WL_characters, WL_digits;
 
-	static bool __debugMode;
+  static bool __debugMode;
 };
 /**
  * @brief searchTextOnBluredImage
@@ -82,19 +78,16 @@ struct constant
  * @param startLevel Starting blur level
  * @return a text or an empty string.
  */
-cv::String searchTextOnBluredImage(std::shared_ptr<tesseract::TessBaseAPI> tessApi,
-                                   cv::Mat mat,
-                                   int startLevel = 5);
+cv::String searchTextOnBluredImage(std::shared_ptr<tesseract::TessBaseAPI> tessApi, cv::Mat mat, int startLevel = 5);
 /**
  * @brief The DF_SideSize enum
  * Types to resize image by side.
  * \see searchTextOnDifferentSizes(...)
  */
-enum DF_SideSize
-{
-	DF_Width,      //! Only width
-	DF_Height,     //! Only Height
-	DF_WidthHeight //! Both of them
+enum DF_SideSize {
+  DF_Width,      //! Only width
+  DF_Height,     //! Only Height
+  DF_WidthHeight //! Both of them
 };
 /**
  * @brief searchTextOnDifferentSizes
@@ -122,8 +115,7 @@ cv::String searchTextOnDifferentSizes(std::shared_ptr<tesseract::TessBaseAPI> te
  * @param contour Contour to check
  * @return contour is enternal.
  */
-bool isInternalContour(const std::vector<std::vector<cv::Point>>& contours,
-                       const std::vector<cv::Point>& contour);
+bool isInternalContour(const std::vector<std::vector<cv::Point>>& contours, const std::vector<cv::Point>& contour);
 /**
  * @brief uniqueConsours
  * Removes duplicates.
@@ -139,8 +131,7 @@ void uniqueConsours(std::vector<std::vector<cv::Point>>& contours);
  */
 cv::String textFromImage(std::shared_ptr<tesseract::TessBaseAPI> tessApi, cv::Mat mat);
 
-namespace text
-{
+namespace text {
 /**
  * @brief utf82Str
  * Copy a text from a char array to the cv::String. Text is a character or digit.

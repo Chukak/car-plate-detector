@@ -1,9 +1,9 @@
-#include "misc/logger.h"
 #include "carplatenumberdetector_russian.h"
+#include "misc/logger.h"
 #include "misc/ocr.h"
 
-#include <opencv2/highgui.hpp>
 #include <map>
+#include <opencv2/highgui.hpp>
 
 static const std::map<int, std::string> TestingDataFiles = {
     {0, "1.png"}, // T111TT97
@@ -15,44 +15,42 @@ static const std::map<int, std::string> TestingDataFiles = {
     {6, "7.jpg"}, // О535РК177
 };
 
-cv::String getPathToImage(int index)
-{
-	cv::String result = SOURCE_DIR;
-	result += "/.testing-data/" + TestingDataFiles.at(index);
-	return result;
+cv::String getPathToImage(int index) {
+  cv::String result = SOURCE_DIR;
+  result += "/.testing-data/" + TestingDataFiles.at(index);
+  return result;
 }
 
-int main()
-{
-	misc::ocr::initGlobalAPI();
+int main() {
+  misc::ocr::initGlobalAPI();
 
-	cv::utils::logging::setLogLevel(cv::utils::logging::LOG_LEVEL_VERBOSE);
+  cv::utils::logging::setLogLevel(cv::utils::logging::LOG_LEVEL_VERBOSE);
 
-	plate::number::CarPlateNumberDetector_Russian detector(getPathToImage(2));
-	if(detector.isValid()) {
-		// Example show the original image with a car plate
-		//
-		// cv::imshow("Detect car plate numbers", detector.detectPlateNumbersOnImage());
-		// cv::waitKey();
+  plate::number::CarPlateNumberDetector_Russian detector(getPathToImage(2));
+  if(detector.isValid()) {
+    // Example show the original image with a car plate
+    //
+    // cv::imshow("Detect car plate numbers", detector.detectPlateNumbersOnImage());
+    // cv::waitKey();
 
-		// Example show a car plate number as text
-		for(const cv::Mat& img : detector.plateNumbers()) {
-			cv::String text = misc::ocr::extractTextFromImage(img);
-			std::cout << "FOUND CAR PLATE NUMBER: " << text << " !";
-			//	cv::imshow("Plate number", img);
+    // Example show a car plate number as text
+    for(const cv::Mat& img : detector.plateNumbers()) {
+      cv::String text = misc::ocr::extractTextFromImage(img);
+      std::cout << "FOUND CAR PLATE NUMBER: " << text << " !";
+      //	cv::imshow("Plate number", img);
 
-			break;
-		}
+      break;
+    }
 
-		// for 4.png, pure car plate number image
-		//		{
-		//			cv::String text = misc::ocr::extractTextFromImage(detector.originalImage());
-		//			std::cout << "Found a car plate number: " << text << std::endl;
-		//		}
-	}
-	// cv::waitKey();
+    // for 4.png, pure car plate number image
+    //		{
+    //			cv::String text = misc::ocr::extractTextFromImage(detector.originalImage());
+    //			std::cout << "Found a car plate number: " << text << std::endl;
+    //		}
+  }
+  // cv::waitKey();
 
-	misc::ocr::destroyGlobalAPI();
+  misc::ocr::destroyGlobalAPI();
 
-	return 0;
+  return 0;
 }
