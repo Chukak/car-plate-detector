@@ -131,7 +131,12 @@ bool CarPlateNumberDetector::checkImageAsPlateNumber() const {
     std::vector<cv::Rect> objects;
     _cascadeClassifier.detectMultiScale(img, objects);
 
-    _imageIsPlateNumber = objects.size();
+    if(objects.size() == 1) {
+      cv::Rect rect = objects.at(0);
+
+      _imageIsPlateNumber = (rect.width >= _originalImage.size().width && rect.height >= _originalImage.size().height) ||
+          (rect.width + _offsetX * 3 >= _originalImage.size().width && rect.height + _offsetY * 2 >= _originalImage.size().height);
+    }
   }
 
   return _imageIsPlateNumber;

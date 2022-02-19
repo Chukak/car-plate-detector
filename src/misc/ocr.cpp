@@ -45,7 +45,7 @@ cv::String extractTextFromImage(const cv::Mat& mat, TesseractAPIPtr api) {
   cv::medianBlur(img, img, 3);
   cv::blur(img, img, cv::Size(3, 3));
 
-  cv::Canny(img, img, 100, 200);
+  cv::Canny(img, img, 80, 220);
 
   std::vector<std::vector<cv::Point>> conts;
   std::vector<cv::Vec4i> hierarcy;
@@ -63,7 +63,7 @@ cv::String extractTextFromImage(const cv::Mat& mat, TesseractAPIPtr api) {
     cv::waitKey();
   }
 
-  cv::Mat temp(cv::Size(img.cols, img.rows), 0, cv::Scalar(5));
+  cv::Mat temp(cv::Size(img.cols, img.rows), CV_8U, cv::Scalar(5));
   for(auto start = conts.begin(); start != conts.end();) {
     cv::Rect r = cv::boundingRect(*start);
     bool isInternal = internal::isInternalContour(conts, *start);
@@ -171,7 +171,7 @@ int constant::BLUR_MaxLevel = 18;
 int constant::SZ_imageWidth = 520, constant::SZ_imageHeight = 112;
 
 double constant::LIMIT_imageMaxWidthCoef = 0.22, constant::LIMIT_imageMaxHeightCoef = 0.80,
-       constant::LIMIT_imageMinWidthCoef = 0.03 /* 0.01 */, constant::LIMIT_imageMinHeightCoef = 0.2,
+       constant::LIMIT_imageMinWidthCoef = 0.03 /* 0.01 */, constant::LIMIT_imageMinHeightCoef = 0.24,
        constant::LIMIT_imageMinWidthInternalCoef = 0.010, constant::LIMIT_imageMinHeightInternalCoef = 0.09;
 
 bool constant::__debugMode = true;

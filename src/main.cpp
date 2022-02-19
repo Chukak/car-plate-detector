@@ -11,8 +11,8 @@ static const std::map<int, std::string> TestingDataFiles = {
     {2, "3.png"}, // У202АР125
     {3, "4.png"}, // К574МР77
     {4, "5.png"}, // Т368УУ199
-    {5, "6.png"}, //
-    {6, "7.jpg"}, // О535РК177
+    // {5, "6.png"}, //
+    {6, "7.png"}, // О535РК177
 };
 
 cv::String getPathToImage(int index) {
@@ -26,7 +26,7 @@ int main() {
 
   cv::utils::logging::setLogLevel(cv::utils::logging::LOG_LEVEL_VERBOSE);
 
-  plate::number::CarPlateNumberDetector_Russian detector(getPathToImage(2));
+  plate::number::CarPlateNumberDetector_Russian detector(getPathToImage(3));
   if(detector.isValid()) {
     // Example show the original image with a car plate
     //
@@ -36,19 +36,10 @@ int main() {
     // Example show a car plate number as text
     for(const cv::Mat& img : detector.plateNumbers()) {
       cv::String text = misc::ocr::extractTextFromImage(img);
-      std::cout << "FOUND CAR PLATE NUMBER: " << text << " !";
-      //	cv::imshow("Plate number", img);
-
+      std::cout << "FOUND CAR PLATE NUMBER: " << text << " !" << std::endl;
       break;
     }
-
-    // for 4.png, pure car plate number image
-    //		{
-    //			cv::String text = misc::ocr::extractTextFromImage(detector.originalImage());
-    //			std::cout << "Found a car plate number: " << text << std::endl;
-    //		}
   }
-  // cv::waitKey();
 
   misc::ocr::destroyGlobalAPI();
 
