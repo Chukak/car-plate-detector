@@ -8,8 +8,17 @@
 namespace plate {
 namespace number {
 namespace base {
+
+const int CarPlateNumberDetector::_offsetX = 3, CarPlateNumberDetector::_offsetY = 6, CarPlateNumberDetector::_offsetW = 6,
+          CarPlateNumberDetector::_offsetH = 12;
+
 CarPlateNumberDetector::CarPlateNumberDetector(const cv::String& imagePath, const cv::String& pathToHaar) :
     _imagePath(imagePath), _pathToHaar(pathToHaar) {
+  if(!_cascadeClassifier.load(_pathToHaar)) {
+    CV_ERROR("Cannot load file '" << _pathToHaar << "'.");
+    return;
+  }
+
   if(!cv::utils::fs::exists(imagePath)) {
     CV_ERROR("File '" << imagePath << "' not exists.");
     return;
@@ -22,19 +31,19 @@ CarPlateNumberDetector::CarPlateNumberDetector(const cv::String& imagePath, cons
   }
 
   int width = _originalImage.size().width, height = _originalImage.size().height;
-  if(width > 1024) { width = 1024; }
-  if(height > 768) { height = 768; }
+  width = width > 1024 ? 1024 : width;
+  height = height > 768 ? 768 : height;
+
+  if(checkImageAsPlateNumber()) {
+    width = 512;
+    height = 110;
+  }
 
   cv::resize(_originalImage, _originalImage, cv::Size(width, height));
 
   cv::cvtColor(_originalImage, _originalImage, cv::COLOR_BGR2RGB);
   if(_originalImage.empty()) {
     CV_ERROR("Cannot convert image from BGR to RGB,");
-    return;
-  }
-
-  if(!_cascadeClassifier.load(_pathToHaar)) {
-    CV_ERROR("Cannot load file '" << _pathToHaar << "'.");
     return;
   }
 }
@@ -48,11 +57,13 @@ cv::Mat CarPlateNumberDetector::detectPlateNumbersOnImage() const {
 
   cv::Mat img = _originalImage.clone();
 
-  std::vector<cv::Rect> objects;
-  _cascadeClassifier.detectMultiScale(img, objects);
+  if(!checkImageAsPlateNumber()) {
+    std::vector<cv::Rect> objects;
+    _cascadeClassifier.detectMultiScale(img, objects);
 
-  for(const cv::Rect& rect : objects) {
-    cv::rectangle(img, cv::Point(rect.x, rect.y), cv::Point(rect.x + rect.width, rect.y + rect.height), cv::Scalar(0, 0, 255), 5);
+    for(const cv::Rect& rect : objects) {
+      cv::rectangle(img, cv::Point(rect.x, rect.y), cv::Point(rect.x + rect.width, rect.y + rect.height), cv::Scalar(0, 0, 255), 5);
+    }
   }
 
   return img;
@@ -72,16 +83,15 @@ std::list<cv::Mat> CarPlateNumberDetector::plateNumbers() const {
 
   if(!preDetect()) { return plateNumbers; }
 
-  std::vector<cv::Rect> objects;
+  if(checkImageAsPlateNumber()) {
+    plateNumbers.push_back(_originalImage.clone());
+  } else {
+    std::vector<cv::Rect> objects;
 
-  cv::Mat img = _originalImage.clone();
-  _cascadeClassifier.detectMultiScale(img, objects);
+    cv::Mat img = _originalImage.clone();
+    _cascadeClassifier.detectMultiScale(img, objects);
 
-  for(const cv::Rect& rect : objects) {
-    // TODO: real size
-    cv::Rect realRect(rect.x + 3, rect.y + 6, rect.width - 6, rect.height - 12);
-    cv::Mat plateNumberImg(img(realRect));
-    if(!plateNumberImg.empty()) { plateNumbers.push_back(plateNumberImg); }
+    processDetectedObjects(objects, img, plateNumbers);
   }
 
   return plateNumbers;
@@ -94,6 +104,37 @@ bool CarPlateNumberDetector::preDetect() const {
     _prepared = false;
   }
   return result;
+}
+
+void CarPlateNumberDetector::processDetectedObjects(const std::vector<cv::Rect>& objects,
+                                                    cv::Mat interestedImage,
+                                                    std::list<cv::Mat>& results,
+                                                    int offsetX,
+                                                    int offsetY,
+                                                    int offsetW,
+                                                    int offsetH) const {
+  for(const cv::Rect& rect : objects) {
+    // TODO: real size
+    cv::Rect realRect(rect.x + offsetX, rect.y + offsetY, rect.width - offsetW, rect.height - offsetH);
+    cv::Mat plateNumberImg(interestedImage(realRect));
+
+    if(!plateNumberImg.empty()) { results.push_back(plateNumberImg); }
+  }
+}
+
+bool CarPlateNumberDetector::checkImageAsPlateNumber() const {
+  if(!_imageIsPlateNumber) {
+    cv::Mat img = cv::Mat(cv::Size(_originalImage.cols + _offsetX * 20, _originalImage.rows + _offsetY * 15), _originalImage.type());
+    _originalImage.copyTo(
+        img(cv::Rect((_offsetX * 20) / 2, (_offsetY * 15) / 2, img.size().width - _offsetX * 20, img.size().height - _offsetY * 15)));
+
+    std::vector<cv::Rect> objects;
+    _cascadeClassifier.detectMultiScale(img, objects);
+
+    _imageIsPlateNumber = objects.size();
+  }
+
+  return _imageIsPlateNumber;
 }
 
 } // namespace base

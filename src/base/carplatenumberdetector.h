@@ -28,11 +28,23 @@ class CarPlateNumberDetector {
 
   private:
   bool preDetect() const;
+  void processDetectedObjects(const std::vector<cv::Rect>& objects,
+                              cv::Mat interestedImage,
+                              std::list<cv::Mat>& results,
+                              int offsetX = _offsetX,
+                              int offsetY = _offsetY,
+                              int offsetW = _offsetW,
+                              int offsetH = _offsetH) const;
+  bool checkImageAsPlateNumber() const;
 
   private:
   cv::String _imagePath, _pathToHaar;
   cv::Mat _originalImage;
   mutable cv::CascadeClassifier _cascadeClassifier;
+  mutable bool _imageIsPlateNumber{false};
+
+  private:
+  static const int _offsetX, _offsetY, _offsetW, _offsetH;
 };
 
 } // namespace base
