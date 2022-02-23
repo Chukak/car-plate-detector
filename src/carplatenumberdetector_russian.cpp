@@ -7,6 +7,9 @@ namespace plate {
 namespace number {
 const cv::String CarPlateNumberDetector_Russian::_haarCascadeCarPlateNumberRus(HAARCASCADE_CAR_PLATE_NUMBER_RUS);
 
+CarPlateNumberDetector_Russian::CarPlateNumberDetector_Russian() : base::CarPlateNumberDetector() {
+}
+
 CarPlateNumberDetector_Russian::CarPlateNumberDetector_Russian(const cv::String& imagePath) :
     base::CarPlateNumberDetector(imagePath, _haarCascadeCarPlateNumberRus) {
 }

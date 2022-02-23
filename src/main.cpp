@@ -5,28 +5,20 @@
 #include <map>
 #include <opencv2/highgui.hpp>
 
-static const std::map<int, std::string> TestingDataFiles = {
-    {0, "1.png"}, // T111TT97
-    {1, "2.png"}, // B007BE777
-    {2, "3.png"}, // У202АР125
-    {3, "4.png"}, // К574МР77
-    {4, "5.png"}, // Т368УУ199
-    // {5, "6.png"}, //
-    {6, "7.png"}, // О535РК177
-};
-
-cv::String getPathToImage(int index) {
+cv::String getPathToImage() {
   cv::String result = SOURCE_DIR;
-  result += "/.testing-data/" + TestingDataFiles.at(index);
+  result += "/tests/russian/numbers/num_К574МР77.png";
   return result;
 }
 
 int main() {
   misc::ocr::initGlobalAPI();
 
+  misc::ocr::internal::constant::__debugMode = true;
+
   cv::utils::logging::setLogLevel(cv::utils::logging::LOG_LEVEL_VERBOSE);
 
-  plate::number::CarPlateNumberDetector_Russian detector(getPathToImage(3));
+  plate::number::CarPlateNumberDetector_Russian detector(getPathToImage());
   if(detector.isValid()) {
     // Example show the original image with a car plate
     //

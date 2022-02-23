@@ -12,6 +12,9 @@ namespace base {
 const int CarPlateNumberDetector::_offsetX = 3, CarPlateNumberDetector::_offsetY = 6, CarPlateNumberDetector::_offsetW = 6,
           CarPlateNumberDetector::_offsetH = 12;
 
+CarPlateNumberDetector::CarPlateNumberDetector() {
+}
+
 CarPlateNumberDetector::CarPlateNumberDetector(const cv::String& imagePath, const cv::String& pathToHaar) :
     _imagePath(imagePath), _pathToHaar(pathToHaar) {
   if(!_cascadeClassifier.load(_pathToHaar)) {
@@ -124,7 +127,7 @@ void CarPlateNumberDetector::processDetectedObjects(const std::vector<cv::Rect>&
 
 bool CarPlateNumberDetector::checkImageAsPlateNumber() const {
   if(!_imageIsPlateNumber) {
-    cv::Mat img = cv::Mat(cv::Size(_originalImage.cols + _offsetX * 20, _originalImage.rows + _offsetY * 15), _originalImage.type());
+    cv::Mat img = cv::Mat(cv::Size(_originalImage.cols + _offsetX * 20, _originalImage.rows + _offsetY * 15), _originalImage.type(), 0.0);
     _originalImage.copyTo(
         img(cv::Rect((_offsetX * 20) / 2, (_offsetY * 15) / 2, img.size().width - _offsetX * 20, img.size().height - _offsetY * 15)));
 

@@ -14,6 +14,7 @@ namespace base {
  */
 class CarPlateNumberDetector {
   public:
+  explicit CarPlateNumberDetector();
   explicit CarPlateNumberDetector(const cv::String& imagePath, const cv::String& pathToHaar);
 
   cv::String imagePath() const;

@@ -19,6 +19,7 @@ TesseractAPIPtr initGlobalAPI() {
   _api->SetVariable("load_freq_dawg", "0");
 
   // TODO: does not work on some images
+  // TODO: tesseract max length of char: sometimes '1' recognized like '41'
   _api->SetVariable("tessedit_do_invert", "0");
   _api->SetVariable("textord_tabfind_vertical_text", "0");
   _api->SetPageSegMode(tesseract::PSM_SINGLE_CHAR);
@@ -174,7 +175,7 @@ double constant::LIMIT_imageMaxWidthCoef = 0.22, constant::LIMIT_imageMaxHeightC
        constant::LIMIT_imageMinWidthCoef = 0.03 /* 0.01 */, constant::LIMIT_imageMinHeightCoef = 0.24,
        constant::LIMIT_imageMinWidthInternalCoef = 0.010, constant::LIMIT_imageMinHeightInternalCoef = 0.09;
 
-bool constant::__debugMode = true;
+bool constant::__debugMode = false;
 
 const cv::String constant::WL_characters("аАвВеЕкКмМнНоОрРсСтТуУхХ"), constant::WL_digits("0123456789");
 
@@ -262,6 +263,16 @@ cv::String utf82Str(const char* utf8, size_t len) {
     lenResult = 1;
     if(len > 2 && utf8[1] != ' ' && utf8[1] != '\0') { lenResult = 2; }
   }
+
+  // check ascii codes for integers
+  if(lenResult == 2) {
+    int c1 = static_cast<int>(utf8[0]), c2 = static_cast<int>(utf8[1]);
+    if(48 <= c1 && c1 <= 57 && 48 <= c2 && c2 <= 57) {
+      ++utf8; // increment a pointer
+      lenResult = 1;
+    }
+  }
+
   if(lenResult > 0) {
     result = cv::String(lenResult, ' ');
     std::strncpy(&result[0], utf8, lenResult);

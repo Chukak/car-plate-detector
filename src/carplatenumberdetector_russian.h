@@ -7,6 +7,7 @@ namespace plate {
 namespace number {
 class CarPlateNumberDetector_Russian : public base::CarPlateNumberDetector {
   public:
+  explicit CarPlateNumberDetector_Russian();
   explicit CarPlateNumberDetector_Russian(const cv::String& imagePath);
 
   protected:

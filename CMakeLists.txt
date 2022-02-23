@@ -29,8 +29,10 @@ include_directories(${Tesseract_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
 
 find_package(Boost 1.52 REQUIRED locale)
 
+set(MAIN_SRC_FILE
+    src/main.cpp)
+
 set(SRC_FILES
-    src/main.cpp
     src/base/carplatenumberdetector.cpp
     src/misc/ocr.cpp
     src/carplatenumberdetector_russian.cpp
@@ -45,7 +47,30 @@ set(PROJECT_COMPILE_DEFINITIONS
     -DHAARCASCADE_CAR_PLATE_NUMBER_RUS=\"${OpenCV_DATAFILES_PATH}/haarcascades/haarcascade_russian_plate_number.xml\"
     -DSOURCE_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}\")
 
-
-add_executable(${PROJECT_NAME} ${SRC_FILES} ${HEADER_FILES})
+add_executable(${PROJECT_NAME} ${SRC_FILES} ${MAIN_SRC_FILE} ${HEADER_FILES})
 target_link_libraries(${PROJECT_NAME} ${OpenCV_LIBS} ${Tesseract_LIBRARIES} ${Boost_LIBRARIES})
 target_compile_definitions(${PROJECT_NAME} PRIVATE ${PROJECT_COMPILE_DEFINITIONS})
+
+if (NOT TESTS_SKIP)
+    find_package(GTest REQUIRED)
+
+    if(CMAKE_C_COMPILER_ID STREQUAL "GNU")
+        list(APPEND CXX_PROJECT_COMPILE_FLAGS -g)
+    endif()
+
+    if (UNIX)
+        list(APPEND CXX_PROJECT_COMPILE_FLAGS -fno-omit-frame-pointer -fsanitize=address)
+        list(APPEND CXX_PROJECT_LINK_FLAGS -lasan)
+    endif ()
+
+    set(TEST_SRC_FILES
+        tests/tst_carplatenumber.cpp)
+
+    set(PROJECT_NAME_TEST ${PROJECT_NAME}-test)
+
+    add_executable(${PROJECT_NAME_TEST} ${SRC_FILES} ${TEST_SRC_FILES} ${HEADER_FILES})
+    target_link_libraries(${PROJECT_NAME_TEST} ${OpenCV_LIBS} ${Tesseract_LIBRARIES} ${Boost_LIBRARIES}
+        ${GTEST_LIBRARIES} ${GTEST_MAIN_LIBRARIES})
+    target_compile_definitions(${PROJECT_NAME_TEST} PRIVATE ${PROJECT_COMPILE_DEFINITIONS})
+    target_include_directories(${PROJECT_NAME_TEST} PRIVATE src)
+endif()
