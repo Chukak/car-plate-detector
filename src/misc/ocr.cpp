@@ -87,7 +87,6 @@ cv::String extractTextFromImage(const cv::Mat& mat, TesseractAPIPtr api) {
   internal::uniqueConsours(conts);
 
   for(auto start = conts.begin(); start != conts.end();) {
-    cv::Rect r = cv::boundingRect(*start);
     if(internal::isInternalContour(conts, *start)) {
       cv::fillPoly(temp, std::vector<std::vector<cv::Point>>{*start}, cv::Scalar(0, 0, 0));
 
@@ -265,17 +264,18 @@ cv::String utf82Str(const char* utf8, size_t len) {
   }
 
   // check ascii codes for integers
+  int offsetPointer = 0;
   if(lenResult == 2) {
     int c1 = static_cast<int>(utf8[0]), c2 = static_cast<int>(utf8[1]);
     if(48 <= c1 && c1 <= 57 && 48 <= c2 && c2 <= 57) {
-      ++utf8; // increment a pointer
+      offsetPointer = 1; // increment a pointer
       lenResult = 1;
     }
   }
 
   if(lenResult > 0) {
     result = cv::String(lenResult, ' ');
-    std::strncpy(&result[0], utf8, lenResult);
+    std::strncpy(&result[0], utf8 + offsetPointer, lenResult);
   }
   return result;
 }
