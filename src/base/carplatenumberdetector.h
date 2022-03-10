@@ -18,6 +18,7 @@ class CarPlateNumberDetector {
   explicit CarPlateNumberDetector(const cv::String& imagePath, const cv::String& pathToHaar);
 
   cv::String imagePath() const;
+  //! NOTE: this method is unused
   cv::Mat detectPlateNumbersOnImage() const;
   cv::Mat originalImage() const;
   virtual bool isValid() const;

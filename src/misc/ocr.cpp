@@ -60,7 +60,7 @@ cv::String extractTextFromImage(const cv::Mat& mat, TesseractAPIPtr api) {
   });
 
   if(internal::constant::__debugMode) {
-    cv::imshow("Prepared", img);
+    cv::imshow("Prepared image", img);
     cv::waitKey();
   }
 

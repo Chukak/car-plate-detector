@@ -24,10 +24,13 @@ if (NOT ${Tesseract_FOUND})
     set(Tesseract_LIBRARIES Tesseract::libresseract)
     set(Tesseract_INCLUDE_DIRS)
 endif()
-
 include_directories(${Tesseract_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
 
+# NOTE: need russian locale - ru_RU.utf8
 find_package(Boost 1.52 REQUIRED locale)
+
+find_package(Qt5 5.9 COMPONENTS Widgets REQUIRED)
+set(Qt5_LIBRARIES Qt5::Widgets)
 
 set(MAIN_SRC_FILE
     src/main.cpp)
@@ -48,7 +51,8 @@ set(PROJECT_COMPILE_DEFINITIONS
     -DSOURCE_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}\")
 
 add_executable(${PROJECT_NAME} ${SRC_FILES} ${MAIN_SRC_FILE} ${HEADER_FILES})
-target_link_libraries(${PROJECT_NAME} ${OpenCV_LIBS} ${Tesseract_LIBRARIES} ${Boost_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} ${OpenCV_LIBS} ${Tesseract_LIBRARIES} ${Boost_LIBRARIES}
+    ${Qt5_LIBRARIES})
 target_compile_definitions(${PROJECT_NAME} PRIVATE ${PROJECT_COMPILE_DEFINITIONS})
 
 if (NOT TESTS_SKIP)
@@ -71,7 +75,7 @@ if (NOT TESTS_SKIP)
     add_executable(${PROJECT_NAME_TEST} ${SRC_FILES} ${TEST_SRC_FILES} ${HEADER_FILES})
     target_compile_options(${PROJECT_NAME_TEST} PRIVATE ${PROJECT_TEST_COMPILE_FLAGS})
     target_link_libraries(${PROJECT_NAME_TEST} -lasan # libasan preload
-        ${OpenCV_LIBS} ${Tesseract_LIBRARIES} ${Boost_LIBRARIES}
+        ${OpenCV_LIBS} ${Tesseract_LIBRARIES} ${Boost_LIBRARIES} ${Qt5_LIBRARIES}
         ${GTEST_LIBRARIES} ${GTEST_MAIN_LIBRARIES} ${PROJECT_TEST_LINK_FLAGS})
     target_compile_definitions(${PROJECT_NAME_TEST} PRIVATE ${PROJECT_COMPILE_DEFINITIONS})
     target_include_directories(${PROJECT_NAME_TEST} PRIVATE src)
