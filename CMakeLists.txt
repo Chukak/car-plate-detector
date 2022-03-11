@@ -32,6 +32,27 @@ find_package(Boost 1.52 REQUIRED locale)
 find_package(Qt5 5.9 COMPONENTS Widgets REQUIRED)
 set(Qt5_LIBRARIES Qt5::Widgets)
 
+# NOTE: Instruction to generate the car plate font (If needed)
+# 1. mkdir -p /usr/share/fonts/car-plate-detector-fonts/
+# 2. cp ./data/tesseract/fonts/RoadNumbers.otf /usr/share/fonts/car-plate-detector-fonts/
+# 3. fc-cache -f -v
+# 4. fc-list | grep "Road"
+
+# NOTE: Create a training data
+# 1. cd data/tesseract/generated/
+# 2. text2image --text=../text/RoadNumbers.exp0.gt.txt --outputbase=rus.RoadNumbers.exp0 --font='RoadNumbers' --fonts_dir=/usr/share/fonts/car-plate-detector-fonts/
+# 3. text2image --text=../text/RoadNumbers.exp1.gt.txt --outputbase=rus.RoadNumbers.exp1 --font='RoadNumbers' --fonts_dir=/usr/share/fonts/car-plate-detector-fonts/
+# 4. tesseract rus.RoadNumbers.exp0.tif rus.RoadNumbers.exp0 --psm 10 lstm.train
+# 5. tesseract rus.RoadNumbers.exp1.tif rus.RoadNumbers.exp1 --psm 10 lstm.train
+# 6. cd -
+
+# NOTE: use tesstraint to training
+# 1. cd ../ && git clone https://github.com/tesseract-ocr/tesstrain.git && cd tesstrain
+# 2. mkdir -p data/rus-car-plate-number-ground-truth
+# 3. cp -r car-plate-detector/data/tesseract/generated/* ./data/rus-car-plate-number-ground-truth/
+# 4. cp -r car-plate-detector/data/tesseract/text/* ./data/rus-car-plate-number-ground-truth/
+# TODO:
+
 set(MAIN_SRC_FILE
     src/main.cpp)
 

@@ -176,7 +176,7 @@ double constant::LIMIT_imageMaxWidthCoef = 0.22, constant::LIMIT_imageMaxHeightC
 
 bool constant::__debugMode = false;
 
-const cv::String constant::WL_characters("аАвВеЕкКмМнНоОрРсСтТуУхХ"), constant::WL_digits("0123456789");
+const cv::String constant::WL_characters("АВЕКМНОРСТУХ"), constant::WL_digits("0123456789");
 
 cv::String searchTextOnBluredImage(std::shared_ptr<tesseract::TessBaseAPI> tessApi, cv::Mat mat, int startLevel) {
   cv::String result;
