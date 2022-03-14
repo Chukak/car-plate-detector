@@ -1,5 +1,8 @@
 #!/bin/bash
 
+CURRENT_DIR=$(pwd)
+MODEL_FILENAME=rus-car-plate-number
+
 mkdir -p /usr/share/fonts/car-plate-detector-fonts/
 cp ./data/tesseract/fonts/RoadNumbers.otf /usr/share/fonts/car-plate-detector-fonts/
 fc-cache -f -v
@@ -18,10 +21,15 @@ cd ../
 git clone https://github.com/tesseract-ocr/tesstrain.git || true
 chmod o+w -R tesstrain
 cd tesstrain
-mkdir -p data/rus-car-plate-number-ground-truth
-cp -r ../car-plate-detector/data/tesseract/generated/* ./data/rus-car-plate-number-ground-truth/
-cp -r ../car-plate-detector/data/tesseract/text/* ./data/rus-car-plate-number-ground-truth/
+rm -rf data/$MODEL_FILENAME-ground-truth
+mkdir -p data/$MODEL_FILENAME-ground-truth
+cp -r $CURRENT_DIR/data/tesseract/generated/* ./data/$MODEL_FILENAME-ground-truth/
+cp -r $CURRENT_DIR/data/tesseract/text/* ./data/$MODEL_FILENAME-ground-truth/
 
 # Trainig
-make training MODEL_NAME=rus-car-plate-number START_MODEL=rus PSM=10 TESSDATA=/usr/share/tesseract-ocr/4.00/tessdata MAX_ITERATIONS=1000
-make clean-output MODEL_NAME=rus-car-plate-number START_MODEL=rus 
+# see https://github.com/tesseract-ocr/tesstrain/issues/269
+# run it without START_MODEL!
+# /usr/share/tesseract-ocr/4.00/tessdata - for tesseract 4.00!
+make training MODEL_NAME=$MODEL_FILENAME PSM=10 TESSDATA=/usr/share/tesseract-ocr/4.00/tessdata MAX_ITERATIONS=10000 #START_MODEL=rus
+make clean-output MODEL_NAME=$MODEL_FILENAME # START_MODEL=rus 
+cp data/$MODEL_FILENAME.traineddata $CURRENT_DIR/data/tesseract/models/

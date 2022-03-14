@@ -24,6 +24,8 @@ if (NOT ${Tesseract_FOUND})
     set(Tesseract_LIBRARIES Tesseract::libresseract)
     set(Tesseract_INCLUDE_DIRS)
 endif()
+# NOTE: To training tesseract data see 'create-training-data.sh'
+
 include_directories(${Tesseract_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
 
 # NOTE: need russian locale - ru_RU.utf8
