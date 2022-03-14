@@ -24,6 +24,7 @@ if (NOT ${Tesseract_FOUND})
     set(Tesseract_LIBRARIES Tesseract::libresseract)
     set(Tesseract_INCLUDE_DIRS)
 endif()
+set(Tesseract_DATAFILES_PATH ${CMAKE_CURRENT_SOURCE_DIR}/data/tesseract/)
 # NOTE: To training tesseract data see 'create-training-data.sh'
 
 include_directories(${Tesseract_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
@@ -33,6 +34,13 @@ find_package(Boost 1.52 REQUIRED locale)
 
 find_package(Qt5 5.9 COMPONENTS Widgets REQUIRED)
 set(Qt5_LIBRARIES Qt5::Widgets)
+
+
+# TODO: copy traineddata to '/usr/share/${PROJECT_NAME}' if needed
+configure_file(${Tesseract_DATAFILES_PATH}/models/rus-car-plate-number.traineddata
+    ${CMAKE_CURRENT_BINARY_DIR}/models/rus-lang.traineddata COPYONLY)
+configure_file(${Tesseract_DATAFILES_PATH}/models/rus-best.traineddata
+    ${CMAKE_CURRENT_BINARY_DIR}/models/rus-lang-best.traineddata COPYONLY)
 
 set(MAIN_SRC_FILE
     src/main.cpp)
@@ -50,7 +58,8 @@ set(HEADER_FILES
 )
 set(PROJECT_COMPILE_DEFINITIONS
     -DHAARCASCADE_CAR_PLATE_NUMBER_RUS=\"${OpenCV_DATAFILES_PATH}/haarcascades/haarcascade_russian_plate_number.xml\"
-    -DSOURCE_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}\")
+    -DSOURCE_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}\"
+    -DTRAINEDDATA_DIR=\"${CMAKE_CURRENT_BINARY_DIR}/models/\")
 
 add_executable(${PROJECT_NAME} ${SRC_FILES} ${MAIN_SRC_FILE} ${HEADER_FILES})
 target_link_libraries(${PROJECT_NAME} ${OpenCV_LIBS} ${Tesseract_LIBRARIES} ${Boost_LIBRARIES}

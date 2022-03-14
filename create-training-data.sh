@@ -21,15 +21,27 @@ cd ../
 git clone https://github.com/tesseract-ocr/tesstrain.git || true
 chmod o+w -R tesstrain
 cd tesstrain
+
 rm -rf data/$MODEL_FILENAME-ground-truth
 mkdir -p data/$MODEL_FILENAME-ground-truth
 cp -r $CURRENT_DIR/data/tesseract/generated/* ./data/$MODEL_FILENAME-ground-truth/
 cp -r $CURRENT_DIR/data/tesseract/text/* ./data/$MODEL_FILENAME-ground-truth/
 
+cp $CURRENT_DIR/data/tesseract/Cyrillic.unicharset data/
+
 # Trainig
 # see https://github.com/tesseract-ocr/tesstrain/issues/269
 # run it without START_MODEL!
 # /usr/share/tesseract-ocr/4.00/tessdata - for tesseract 4.00!
-make training MODEL_NAME=$MODEL_FILENAME PSM=10 TESSDATA=/usr/share/tesseract-ocr/4.00/tessdata MAX_ITERATIONS=10000 #START_MODEL=rus
-make clean-output MODEL_NAME=$MODEL_FILENAME # START_MODEL=rus 
+make clean MODEL_NAME=$MODEL_FILENAME
+make training MODEL_NAME=$MODEL_FILENAME PSM=10 TESSDATA=/usr/share/tesseract-ocr/4.00/tessdata MAX_ITERATIONS=10000 NUMBERS_FILE=$CURRENT_DIR/data/tesseract/tessdata/number WORDLIST_FILE=$CURRENT_DIR/data/tesseract/tessdata/word_list PUNC_FILE=$CURRENT_DIR/data/tesseract/tessdata/punc NET_SPEC=[1,36,0,1Ct3,3,16Mp3,3Lfys64Lfx96Lrx96Lfx512O1c1] #START_MODEL=rus 
+
 cp data/$MODEL_FILENAME.traineddata $CURRENT_DIR/data/tesseract/models/
+
+rm -rf /usr/share/fonts/car-plate-detector-fonts/
+fc-cache -f -v
+
+# NOTE: 
+# dawg to wordlist example.
+# rus-car-plate-number.lstm-unicharset will be in directory rus after main training!
+# dawg2wordlist rus-car-plate-number.lstm-unicharset rus-car-plate-number.lstm-word-dawg word.list
